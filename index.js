@@ -12,13 +12,19 @@ const handleError = (err) => {
     process.exit(1);
 };
 
-const getCustomerChunk = (count) => {
+const getCustomerChunk = (idx, count) => {
     const numItems = Math.min(count, customerData.length);
-    return customerData.splice(0, numItems).map( (c, idx) => Object.assign(c, customerAddressData[idx]));
+    return { 
+        start: idx*count,
+        end: idx*count+numItems,
+        customers: customerData.splice(0, numItems).map( (c, idx) => Object.assign(c, customerAddressData[idx]))
+    };
 };
 
-const insertTask = (customers, db) => {
+const insertTask = (data, db) => {
+    const { start, end, customers } = data;
     return (callback) => {
+        console.log(`Processing customers from ${start}-${end}`);
         db.collection('accounts')
             .insert(customers, (err, data) => {
                 if (err) return callback(err);
@@ -27,8 +33,10 @@ const insertTask = (customers, db) => {
     };
 };
 
-const insertOrUpdateTask = (customers, db) => {
+const insertOrUpdateTask = (data, db) => {
+    const { start, end, customers } = data;
     return (callback) => {
+        console.log(`Processing customers from ${start}-${end} (inserting or updating if already existing, one by one)`);
         async.parallel( customers.map( customer => {
             return (cb) => {
                 db.collection('accounts').find({ id: customer.id }).toArray( (err, results) => {
@@ -57,10 +65,10 @@ function migrate(chunkSize, taskOperation) {
 
     mongodb.MongoClient.connect(url, (err, db) => {
         let remainingCustomers = customerData.length;
-        const chunks = []
-        while (remainingCustomers) {
-            chunks.push(getCustomerChunk(chunkSize));
-            remainingCustomers -= chunkSize || 0;
+        const chunks = []; let idx = 0;
+        while (remainingCustomers>0) {
+            chunks.push(getCustomerChunk(idx++, chunkSize));
+            remainingCustomers -= chunkSize;
         }
         async.parallel(chunks.map( chunk => taskOperation(chunk, db)), (err, data) => {
             if (err) return handleError(err);
