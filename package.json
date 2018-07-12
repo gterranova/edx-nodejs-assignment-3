@@ -1,0 +1,23 @@
+{
+  "name": "edx-nodejs-assignment-3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gterranova/edx-nodejs-assignment-3.git"
+  },
+  "author": "Gianpaolo Terranova",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gterranova/edx-nodejs-assignment-3/issues"
+  },
+  "homepage": "https://github.com/gterranova/edx-nodejs-assignment-3#readme",
+  "dependencies": {
+    "async": "2.6.1",
+    "mongodb": "2.2.35"
+  }
+}
