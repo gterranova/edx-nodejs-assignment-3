@@ -15,7 +15,7 @@ const handleError = (err) => {
 const getCustomerChunk = (idx, count) => {
     const numItems = Math.min(count, customerData.length);
     return { 
-        start: idx*count,
+        start: idx*count+1,
         end: idx*count+numItems,
         customers: customerData.splice(0, numItems).map( (c, idx) => Object.assign(c, customerAddressData[idx]))
     };
